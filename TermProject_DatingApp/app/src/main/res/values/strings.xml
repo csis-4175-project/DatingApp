@@ -1,5 +1,74 @@
 <resources>
     <string name="app_name">TermProject_DatingApp</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="last_name" />
+    <string name="first_name" />
+    <string name="email" />
+    <string name="password" />
+    <string name="hint_password">Password</string>
+    <string name="hint_email">Your College Email</string>
+    <string name="sign_in">Sign In</string>
+    <string-array name="programs_array">
+        <item>Accounting</item>
+        <item>Anthropology</item>
+        <item>Bachelor of Performing Arts</item>
+        <item>Biology</item>
+        <item>Business</item>
+        <item>Business Law</item>
+        <item>Chemistry</item>
+        <item>Child and Youth Care</item>
+        <item>Commerce &amp; Business Administration</item>
+        <item>Communications</item>
+        <item>Computing Science</item>
+        <item>Computing Studies &amp; Information Systems</item>
+        <item>Creative Writing</item>
+        <item>Criminology</item>
+        <item>Disability &amp; Community Studies</item>
+        <item>Dispensing Opticianry</item>
+        <item>Early Childhood Education</item>
+        <item>Earth &amp; Environmental Sciences</item>
+        <item>Economics</item>
+        <item>Engineering</item>
+        <item>English</item>
+        <item>English Language Learning and Acquisition</item>
+        <item>Finance</item>
+        <item>Gender, Sexualities and Women\'s Studies</item>
+        <item>Geography and the Environment</item>
+        <item>Geological Resources</item>
+        <item>Global Learning Global Citizenship</item>
+        <item>Health Information Management</item>
+        <item>Hearing Instrument Practitioner</item>
+        <item>History</item>
+        <item>Hospitality Management</item>
+        <item>Humanities &amp; Social Sciences</item>
+        <item>Intercultural and International Studies</item>
+        <item>Interdisciplinary HSS</item>
+        <item>Interdisciplinary LLPA</item>
+        <item>Legal Studies</item>
+        <item>Marketing</item>
+        <item>Mathematics</item>
+        <item>Mathematics &amp; Science Teaching</item>
+        <item>Mental Health and Personal Support Work</item>
+        <item>Modern Languages</item>
+        <item>Music</item>
+        <item>Nursing</item>
+        <item>Nursing - Psychiatric</item>
+        <item>Office Administration</item>
+        <item>Opticianry</item>
+        <item>Performing &amp; Fine Arts</item>
+        <item>Philosophy</item>
+        <item>Political Science</item>
+        <item>Psychology</item>
+        <item>Science &amp; Technology</item>
+        <item>Sign Language Interpretation</item>
+        <item>Social Work</item>
+        <item>Sociology</item>
+        <item>Sport Science</item>
+        <item>Stagecraft &amp; Event Technology</item>
+        <item>Teaching English as a Second Language</item>
+        <item>Theatre</item>
+        <item>Therapeutic Recreation</item>
+        <item>Veterinary Technology</item>
+        <item>Vocational Education and Skills Training</item>
+        <item>Youth Justice</item>
+    </string-array>
 </resources>
