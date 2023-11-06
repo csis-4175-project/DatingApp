@@ -23,25 +23,26 @@
             android:layout_marginStart="10dp"
             android:layout_centerVertical="true"
             />
+
         <ImageButton
+            android:id="@+id/main_search_button"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@drawable/search_icon"
             android:layout_alignParentEnd="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_centerVertical="true"
             android:layout_marginEnd="10dp"
-            android:id="@+id/main_search_button"
-            />
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/search_icon"
+            tools:ignore="SpeakableTextPresentCheck" />
 
     </RelativeLayout>
 
     <FrameLayout
+        android:id="@+id/main_frame_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/tool_bar"
-        android:id="@+id/main_frame_layout"
-        />
+        android:layout_marginTop="1dp" />
 
     <com.google.android.material.divider.MaterialDivider
         android:layout_width="wrap_content"
