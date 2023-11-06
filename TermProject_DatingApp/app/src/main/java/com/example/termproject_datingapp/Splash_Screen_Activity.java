@@ -2,7 +2,9 @@ package com.example.termproject_datingapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.TextView;
@@ -14,6 +16,7 @@ public class Splash_Screen_Activity extends AppCompatActivity {
     private TextView app_name_1;
     private TextView app_name_2;
     private LottieAnimationView lottieAnimationView;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,14 +40,17 @@ public class Splash_Screen_Activity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(Splash_Screen_Activity.this, MainActivity.class));
-                //create onBoarding part, Three pages
-                //messaging aspect
-                //swiping aspect
-                //creating account aspect
-                //POINTS TO NEXT ACTIVITY
-                //startActivity(new Intent(Splash_Screen_Activity.this, onBoarding.class));
-                finish();
+
+                sharedPreferences = getSharedPreferences("config_file",Context.MODE_PRIVATE);
+                String hasSeenOnBoarding = sharedPreferences.getString("onboarding","not yet");
+
+                if(hasSeenOnBoarding.equals("not yet")) {
+                    startActivity(new Intent(Splash_Screen_Activity.this, OnboardingActivity.class));
+                    finish();
+                } else {
+                    startActivity(new Intent(Splash_Screen_Activity.this, EntryScreenActivity.class));
+                    finish();
+                }
             }
         }, 5000);
     }
