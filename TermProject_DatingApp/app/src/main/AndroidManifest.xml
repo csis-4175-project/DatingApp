@@ -13,6 +13,12 @@
         android:theme="@style/Theme.TermProject_DatingApp"
         tools:targetApi="31" >
         <activity
+            android:name=".SearchUserActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+        <activity
             android:name=".Splash_Screen_Activity"
             android:exported="true" >
             <intent-filter>

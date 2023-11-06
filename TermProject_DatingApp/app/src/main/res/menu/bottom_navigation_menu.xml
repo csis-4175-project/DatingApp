@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:title="Chats"
+        android:icon="@drawable/chat_icons"
+        android:id="@+id/menu_chat"
+
+        />
+
+    <item
+        android:title="Profile"
+        android:icon="@drawable/profile_icon"
+        android:id="@+id/menu_profile"
+
+        />
+
+    <item
+        android:title="Match"
+        android:icon="@drawable/match_icon"
+        android:id="@+id/matching_profile"
+
+        />
+</menu>
