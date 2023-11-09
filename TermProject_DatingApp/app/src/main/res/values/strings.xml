@@ -1,9 +1,5 @@
 <resources>
     <string name="app_name">TermProject_DatingApp</string>
-<<<<<<< HEAD
-<!--<<<<<<< HEAD-->
-=======
->>>>>>> 4d288a4f5cba045e8f58db5dc657d572f15b7506
     <string name="title_activity_login_page">login_page</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
