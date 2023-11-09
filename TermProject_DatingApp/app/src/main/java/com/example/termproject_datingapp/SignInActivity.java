@@ -14,12 +14,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.termproject_datingapp.models.GlobalAuth;
+import com.example.termproject_datingapp.models.User;
+import com.example.termproject_datingapp.utils.Validation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.json.JSONObject;
+
+import java.util.Map;
 
 public class SignInActivity extends AppCompatActivity {
 
@@ -27,7 +38,9 @@ public class SignInActivity extends AppCompatActivity {
     private String email, password;
     private Button signInBtn;
     private FirebaseAuth firebaseAuth;
-    private FirebaseUser user;
+    private FirebaseUser firebaseUser;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +73,7 @@ public class SignInActivity extends AppCompatActivity {
 
     private void signIn() {
         try {
-            veridateInput();
+            Validation.validateSignInInput(email, password);
             signInByFirebase();
         } catch (Exception e) {
             Toast.makeText(SignInActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -68,27 +81,65 @@ public class SignInActivity extends AppCompatActivity {
         }
     }
 
-    private void veridateInput() throws Exception {
-        if(email.isEmpty() || password.isEmpty()) {
-            throw new Exception("Type your email and password");
-        }
-    }
-
     private void signInByFirebase() {
         firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this, signIn -> {
                 if (signIn.isSuccessful()) {
-                    user = firebaseAuth.getCurrentUser();
+                    firebaseUser = firebaseAuth.getCurrentUser();
+                    retrieveUserFromDB();
                     checkEmailVerification();
                 } else {
-                    Toast.makeText(SignInActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignInActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
                 }
             });
     }
 
+    private void retrieveUserFromDB() {
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference("Users");
+        databaseReference.child(firebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Map<String, String> userMap = (Map<String, String>)snapshot.getValue();
+                    User userModel = createUserModel(userMap);
+                    saveUserToSharedPreferences(userModel);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("onCancelled", "Retrieving data cancelled");
+            }
+        });
+    }
+
+    private User createUserModel(Map<String, String> userMap) {
+        User user = new User();
+        user.setUserId(userMap.get("userId"));
+        user.setFirstName(userMap.get("firstName"));
+        user.setLastName(userMap.get("lastName"));
+        user.setEmail(userMap.get("email"));
+        user.setProgram(userMap.get("program"));
+
+        return user;
+    }
+
+    private void saveUserToSharedPreferences(User user) {
+        SharedPreferences sharedPreferences = getSharedPreferences("config_file", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString("userId", user.getUserId());
+        editor.putString("firstName", user.getFirstName());
+        editor.putString("lastName", user.getLastName());
+        editor.putString("email", user.getEmail());
+        editor.putString("program", user.getProgram());
+        editor.apply();
+    }
+
     private void checkEmailVerification() {
         if(isEmailVerified()) {
-            saveUser();
+            saveEmailVerificationToSharedPreferences("verified");
             navigateToMainActivity();
         } else {
             sendEmailVerification();
@@ -96,18 +147,14 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     private boolean isEmailVerified() {
-        return user.isEmailVerified();
+        return firebaseUser.isEmailVerified();
     }
 
-    private void sendEmailVerification() {
-        user.sendEmailVerification().addOnCompleteListener(sendEmail -> {
-            if (sendEmail.isSuccessful()) {
-                startActivity(new Intent(SignInActivity.this, SignUpSuccessActivity.class));
-                finish();
-            } else {
-                Toast.makeText(SignInActivity.this, "Sending email failed.", Toast.LENGTH_SHORT).show();
-            }
-        });
+    private void saveEmailVerificationToSharedPreferences(String status) {
+        SharedPreferences sharedPreferences = getSharedPreferences("config_file", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("emailVerification", status);
+        editor.apply();
     }
 
     private void navigateToMainActivity() {
@@ -123,13 +170,18 @@ public class SignInActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     }
 
-    private void saveUser() {
-        SharedPreferences sharedPreferences = getSharedPreferences("config_file", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+    private void sendEmailVerification() {
+        firebaseUser.sendEmailVerification().addOnCompleteListener(sendEmail -> {
+            if (sendEmail.isSuccessful()) {
+                navigateToSignUpSuccessActivity();
+            } else {
+                Toast.makeText(SignInActivity.this, "Sending email failed.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
-        editor.putString("userId", user.getUid());
-        editor.putString("email", email);
-        editor.putString("emailVerification", "verified");
-        editor.apply();
+    private void navigateToSignUpSuccessActivity() {
+        startActivity(new Intent(SignInActivity.this, SignUpSuccessActivity.class));
+        finish();
     }
 }
