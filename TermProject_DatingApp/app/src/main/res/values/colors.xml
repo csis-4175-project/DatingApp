@@ -8,4 +8,6 @@
     <color name="red_400">#EA7274</color>
     <color name="red_500">#DE4A55</color>
     <color name="red_600">#CF0038</color>
+    <color name="chatColorSender">#1E88E5</color>
+    <color name="chatColorReceiver">#7CB342</color>
 </resources>
