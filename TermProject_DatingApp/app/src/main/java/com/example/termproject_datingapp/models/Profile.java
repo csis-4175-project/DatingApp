@@ -3,8 +3,7 @@ package com.example.termproject_datingapp.models;
 import java.util.Date;
 
 public class Profile {
-    String userId, gender, bio, profilePicUrl;
-    Date dateOfBirth;
+    String userId, gender, bio, profilePicUrl, dateOfBirth;
 
     public Profile() {
     }
@@ -25,7 +24,7 @@ public class Profile {
         return profilePicUrl;
     }
 
-    public Date getDateOfBirth() {
+    public String getDateOfBirth() {
         return dateOfBirth;
     }
 
@@ -45,7 +44,7 @@ public class Profile {
         this.profilePicUrl = profilePicUrl;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 }
