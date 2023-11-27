@@ -12,8 +12,10 @@ import android.widget.ImageButton;
 
 import com.example.termproject_datingapp.UserModel.UserModel;
 import com.example.termproject_datingapp.adapter.SearchUserRecyclerAdapter;
+import com.example.termproject_datingapp.utils.FirebaseUtil;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.auth.User;
 
 public class SearchUserActivity extends AppCompatActivity {
@@ -49,22 +51,21 @@ public class SearchUserActivity extends AppCompatActivity {
                     searchUser.setError("Invalid Input!");
                     return;
                 }
-
                 setupSearchRecylerView(searchItem);
             }
         });
-
     }
 
-    private void setupSearchRecylerView(String item ){
+    private void setupSearchRecylerView(String searchTerm ){
         //this code right now dosn't do much
         //needs firebase data to create query to get user information
         //The Query
-        /*
-            Query query = FirebaseUtil.AllUserCollectionReference()
-                .whereGreaterThanEqualTO("username", searchTerm);
-        */
-        FirestoreRecyclerOptions<UserModel> options = new FirestoreRecyclerOptions.Builder<UserModel>().build();
+
+        Query query = FirebaseUtil.allUserCollectionReference()
+                .whereGreaterThanOrEqualTo("username", searchTerm);
+
+        FirestoreRecyclerOptions<UserModel> options = new FirestoreRecyclerOptions.Builder<UserModel>()
+                .setQuery(query, UserModel.class).build();
         //this code chains the above code, due to no firebase information i wont be using it.
         //.setQuery(query, UserModel.class.build();
 
@@ -84,7 +85,9 @@ public class SearchUserActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        recyclerAdapter.stopListening();
+        if(recyclerAdapter!=null){
+            recyclerAdapter.stopListening();
+        }
     }
     @Override
     protected void onResume() {

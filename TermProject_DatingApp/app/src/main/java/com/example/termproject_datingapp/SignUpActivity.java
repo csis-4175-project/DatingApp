@@ -14,16 +14,20 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.termproject_datingapp.UserModel.UserModel;
 import com.example.termproject_datingapp.adapters.ProgramSpinnerAdapter;
 import com.example.termproject_datingapp.models.GlobalAuth;
 import com.example.termproject_datingapp.models.User;
+import com.example.termproject_datingapp.utils.FirebaseUtil;
 import com.example.termproject_datingapp.utils.Validation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,6 +43,7 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private User user;
+    private UserModel userModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +57,9 @@ public class SignUpActivity extends AppCompatActivity {
         confirmPasswordView = findViewById(R.id.sign_up_confirm_password);
         createBtn = findViewById(R.id.sign_up_create_btn);
 
+        //Habib code
+        getUsername();
+
         initSpinner();
         initFirebaseAuth();
 
@@ -63,6 +71,47 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
     }
+    private void getUsername(){
+        FirebaseUtil.currentUserDetails().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    userModel = task.getResult().toObject(UserModel.class);
+                    if(userModel!=null){
+                        firstNameView.setText(userModel.getUsername());
+                    }
+                }
+            }
+        });
+    }
+
+    private void setUserName(){
+        String username = firstNameView.getText().toString();
+        if(username.isEmpty() || username.length() < 3){
+            firstNameView.setError("Username should be at least 3 letters long");
+            return;
+        }
+        if(userModel!=null){
+            userModel.setUsername(username);
+        }else{
+            //create user based on input
+            //user model
+            userModel = new UserModel(username, FirebaseUtil.currentUSerID() , Timestamp.now());
+        }
+
+        FirebaseUtil.currentUserDetails().set(userModel).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()){
+                    Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                    //clear everything and open main activity
+                    intent.setFlags(intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+            }
+        });
+    }
+
 
     private void initSpinner() {
         programSpinner = findViewById(R.id.sign_up_program);
@@ -107,11 +156,13 @@ public class SignUpActivity extends AppCompatActivity {
         firebaseAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
             .addOnCompleteListener(this, createUser -> {
                 if (createUser.isSuccessful()) {
+                    setUserName();//THIS MAY CAUSE ISSUES; 
                     firebaseUser = firebaseAuth.getCurrentUser();
                     setIdToUserModel(firebaseUser.getUid());
                     sendEmailVerification();
                     saveUserToDB();
                     saveUserToSharedPreferences();
+                    //navigateToSignUpSuccessActivity();
                 } else {
                     Toast.makeText(SignUpActivity.this, "Email is already registered.", Toast.LENGTH_SHORT).show();
                 }

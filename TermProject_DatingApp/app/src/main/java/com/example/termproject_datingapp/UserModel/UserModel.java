@@ -1,30 +1,34 @@
 package com.example.termproject_datingapp.UserModel;
 
+import com.google.firebase.Timestamp;
+
 public class UserModel {
 
 
     private String userId;
-    private String phone;
+
     private String username;
 
+    private Timestamp createdTimestamp;
 
     public UserModel(){
 
     }
 
-    public UserModel(String phone, String username, String userId){
-        this.phone = phone;
+    public UserModel( String username, String userId, Timestamp timestamp){
+        //this.phone = phone;
         this.username = username;
         this.userId = userId;
+        this.createdTimestamp = timestamp;
     }
 
-    public String getPhone() {
-        return phone;
-    }
+//    public String getPhone() {
+//        return phone;
+//    }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+//    public void setPhone(String phone) {
+//        this.phone = phone;
+//    }
 
     public String getUsername() {
         return username;
