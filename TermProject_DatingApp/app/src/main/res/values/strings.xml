@@ -51,6 +51,8 @@
     <string name="hint_password">Password</string>
     <string name="hint_email">Your College Email</string>
     <string name="sign_in">Sign In</string>
+    <string name="bio">User has not written BIO yet</string>
+    <string name="profile_program">User Program</string>
     <string-array name="programs_array">
         <item>Accounting</item>
         <item>Anthropology</item>
