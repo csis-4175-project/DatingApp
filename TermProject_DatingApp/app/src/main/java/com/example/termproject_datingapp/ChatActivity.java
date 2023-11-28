@@ -68,7 +68,6 @@ public class ChatActivity extends AppCompatActivity {
                 if(message.isEmpty()){
                     return;
                 }
-
                 sendMessageToUser(message);
             }
         });
@@ -87,7 +86,6 @@ public class ChatActivity extends AppCompatActivity {
         FirestoreRecyclerOptions<ChatMessageModel> options = new FirestoreRecyclerOptions.Builder<ChatMessageModel>()
                 .setQuery(query, ChatMessageModel.class).build();
 
-
         chatAdapter = new ChatRecycler(options, getApplicationContext() );
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setReverseLayout(true);
@@ -105,12 +103,12 @@ public class ChatActivity extends AppCompatActivity {
 
     private void sendMessageToUser(String message) {
         //setting chat room data
-        chatRoomModel.setLastMessageTimestamp(timestamp);
+        chatRoomModel.setLastMessageTimestamp(timestamp.now());
         chatRoomModel.setLastMessageSenderId(FirebaseUtil.currentUSerID());
+        chatRoomModel.setLastMessage(message);
         FirebaseUtil.getChatroomReference(chatroomId).set(chatRoomModel);
 
-        ChatMessageModel chatMessageModel = new ChatMessageModel(message, FirebaseUtil.currentUSerID(), timestamp);
-
+        ChatMessageModel chatMessageModel = new ChatMessageModel(message, FirebaseUtil.currentUSerID(), timestamp.now());
         FirebaseUtil.getChatroomMessageReference(chatroomId).add(chatMessageModel)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
@@ -128,7 +126,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if(task.isSuccessful()){
-                    chatRoomModel = task.getResult().toObject((ChatRoomModel.class));
+                    chatRoomModel = task.getResult().toObject(ChatRoomModel.class);
                     if(chatRoomModel == null){
                         //first time chat
                         chatRoomModel = new ChatRoomModel(
