@@ -4,7 +4,6 @@ import com.google.firebase.Timestamp;
 
 public class UserModel {
 
-
     private String userId;
 
     private String username;
@@ -45,4 +44,13 @@ public class UserModel {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+    public Timestamp getCreatedTimestamp() {
+        return createdTimestamp;
+    }
+
+    public void setCreatedTimestamp(Timestamp createdTimestamp) {
+        this.createdTimestamp = createdTimestamp;
+    }
+
 }

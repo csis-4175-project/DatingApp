@@ -58,7 +58,8 @@ public class SignUpActivity extends AppCompatActivity {
         createBtn = findViewById(R.id.sign_up_create_btn);
 
         //Habib code
-        getUsername();
+        //don't uncomment yet
+        //getUsername();
 
         initSpinner();
         initFirebaseAuth();
@@ -93,10 +94,11 @@ public class SignUpActivity extends AppCompatActivity {
         }
         if(userModel!=null){
             userModel.setUsername(username);
+            userModel.setCreatedTimestamp(createTimestamp());
         }else{
             //create user based on input
             //user model
-            userModel = new UserModel(username, FirebaseUtil.currentUSerID() , Timestamp.now());
+            userModel = new UserModel(username, FirebaseUtil.currentUSerID() , createTimestamp());
         }
 
         FirebaseUtil.currentUserDetails().set(userModel).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -112,6 +114,10 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
+    private Timestamp createTimestamp() {
+        // Create a timestamp for the current time
+        return new Timestamp(new java.util.Date());
+    }
 
     private void initSpinner() {
         programSpinner = findViewById(R.id.sign_up_program);
@@ -156,13 +162,14 @@ public class SignUpActivity extends AppCompatActivity {
         firebaseAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
             .addOnCompleteListener(this, createUser -> {
                 if (createUser.isSuccessful()) {
-                    setUserName();//THIS MAY CAUSE ISSUES; 
+
+                    setUserName(); //do not move this method
                     firebaseUser = firebaseAuth.getCurrentUser();
                     setIdToUserModel(firebaseUser.getUid());
                     sendEmailVerification();
                     saveUserToDB();
                     saveUserToSharedPreferences();
-                    //navigateToSignUpSuccessActivity();
+                    navigateToSignUpSuccessActivity();
                 } else {
                     Toast.makeText(SignUpActivity.this, "Email is already registered.", Toast.LENGTH_SHORT).show();
                 }

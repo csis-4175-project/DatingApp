@@ -15,6 +15,7 @@ import com.example.termproject_datingapp.ChatActivity;
 import com.example.termproject_datingapp.R;
 import com.example.termproject_datingapp.UserModel.UserModel;
 import com.example.termproject_datingapp.utils.AndroidUtil;
+import com.example.termproject_datingapp.utils.FirebaseUtil;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.auth.User;
@@ -39,12 +40,9 @@ public class SearchUserRecyclerAdapter extends FirestoreRecyclerAdapter<UserMode
     protected void onBindViewHolder(@NonNull UserModelViewHolder holder, int position, @NonNull UserModel model) {
         //add the extra fields for the user
         holder.userName.setText(model.getUsername());
-        //holder.phoneNumber.setText(model.getPhone());
-        //this is for firebase
-        //I will edit this when firebase part is finished
-        //if(model.getUserId() == equals((currentId()))){
-        //holder.userName.setText(model.getUsername()) + "(YOU)";
-        //}
+//        if(model.getUserId().equals(FirebaseUtil.currentUSerID())){
+//            holder.userName.setText(model.getUsername()+" (Me)");
+//        }
 
         //start chatting with user from here
         //sends users to chat activity

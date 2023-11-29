@@ -1,8 +1,12 @@
 package com.example.termproject_datingapp.utils;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 public class FirebaseUtil {
 
@@ -34,5 +38,21 @@ public class FirebaseUtil {
             return userId1+"_"+userId2;
         }else
             return userId2+"_"+userId1;
+    }
+
+    public static CollectionReference allChatRoomCollectionReference(){
+        return FirebaseFirestore.getInstance().collection("chatrooms");
+    }
+
+    public static DocumentReference getOtherUserFromChatRoom(List<String> userId){
+        if(userId.get(0).equals(FirebaseUtil.currentUSerID())){
+           return allUserCollectionReference().document(userId.get(1));
+        }else{
+            return allUserCollectionReference().document(userId.get(0));
+        }
+    }
+
+    public static String timestampToString(com.google.firebase.Timestamp timestamp){
+        return new SimpleDateFormat("HH:MM").format(timestamp.toDate());
     }
 }
