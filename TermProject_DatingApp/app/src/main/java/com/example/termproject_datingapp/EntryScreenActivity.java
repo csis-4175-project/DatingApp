@@ -29,12 +29,7 @@ public class EntryScreenActivity extends AppCompatActivity {
         signUpBtn = findViewById(R.id.entry_sign_up_btn);
         signInBtn = findViewById(R.id.entry_sign_in_btn);
 
-        signUpBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(EntryScreenActivity.this, SignUpActivity.class));
-            }
-        });
+        signUpBtn.setOnClickListener(v -> startActivity(new Intent(EntryScreenActivity.this, SignUpActivity.class)));
 
         signInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,6 +46,8 @@ public class EntryScreenActivity extends AppCompatActivity {
     }
 
     private boolean isLoggedIn() {
-        return !userId.equals("NoUser") && !emailVerificationStatus.equals("unverified");
+        // disable email validation
+        // return !userId.equals("NoUser") && !emailVerificationStatus.equals("unverified");
+        return !userId.equals("NoUser");
     }
 }

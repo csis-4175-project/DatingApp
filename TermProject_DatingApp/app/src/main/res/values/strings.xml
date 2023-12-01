@@ -53,7 +53,9 @@
     <string name="sign_in">Sign In</string>
     <string name="bio">User has not written BIO yet</string>
     <string name="profile_program">User Program</string>
+    <string name="profile_username" />
     <string-array name="programs_array">
+        <item>Select Program</item>
         <item>Accounting</item>
         <item>Anthropology</item>
         <item>Bachelor of Performing Arts</item>

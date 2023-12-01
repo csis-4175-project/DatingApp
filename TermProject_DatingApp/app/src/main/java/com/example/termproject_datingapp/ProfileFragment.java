@@ -1,6 +1,7 @@
 package com.example.termproject_datingapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.Log;
@@ -36,12 +38,15 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
-    private String updateState, userId, firstName, lastName, program, gender, bio, pictureUrl, dateOfBirth;
+    private String userId, firstName, lastName, program, gender, bio, pictureUrl, dateOfBirth;
     private FirebaseUser firebaseUser;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
@@ -58,12 +63,14 @@ public class ProfileFragment extends Fragment {
 
         getDataFromSharedPref();
         retrieveProfileDataFromDB();
-        binding.editBuutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavHostFragment.findNavController(ProfileFragment.this).navigate();
-            }
-        });
+
+        binding.editBuutton.setOnClickListener(v -> ((FragmentActivity) getContext())
+            .getSupportFragmentManager()
+            .beginTransaction()
+            .replace(R.id.main_frame_layout, new EditProfileFragment()).addToBackStack(null)
+            .commit());
+
+        binding.profileLogout.setOnClickListener(v -> logout());
     }
 
     private void getDataFromSharedPref() {
@@ -72,10 +79,6 @@ public class ProfileFragment extends Fragment {
         firstName = sharedPreferences.getString("firstName","null");
         lastName = sharedPreferences.getString("lastName","null");
         program = sharedPreferences.getString("program","null");
-        gender = sharedPreferences.getString("gender","null");
-        pictureUrl = sharedPreferences.getString("pictureUrl","null");
-        dateOfBirth = sharedPreferences.getString("dateOfBirth","null");
-        bio = sharedPreferences.getString("bio","User has not written BIO yet");
     }
 
     private void retrieveProfileDataFromDB() {
@@ -84,17 +87,16 @@ public class ProfileFragment extends Fragment {
         databaseReference.child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-
                 if (snapshot.exists()) {
                     Map<String, String> profileMap = (Map<String, String>)snapshot.getValue();
                     gender = profileMap.get("gender");
-                    pictureUrl = profileMap.get("pictureUrl");
+                    pictureUrl = profileMap.get("profilePicUrl");
                     dateOfBirth = profileMap.get("dateOfBirth");
                     bio = profileMap.get("bio");
+                } else {
+                    gender = "?";
+                    bio = "User has not written BIO yet";
                 }
-
-                Profile profileModel = createProfileModel();
-                saveProfileToSharedPreferences(profileModel);
                 setProfileDataToView();
             }
 
@@ -105,43 +107,22 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private Profile createProfileModel() {
-        Profile profile = new Profile();
-        profile.setUserId(userId);
-        profile.setGender(gender);
-        profile.setProfilePicUrl(pictureUrl);
-        profile.setDateOfBirth(dateOfBirth);
-        profile.setBio(bio);
-
-        return profile;
-    }
-
-    private void saveProfileToSharedPreferences(Profile profile) {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("config_file", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putString("gender", profile.getGender());
-        editor.putString("pictureUrl", profile.getProfilePicUrl());
-        editor.putString("dateOfBirth", profile.getDateOfBirth());
-        editor.putString("bio", profile.getBio());
-
-        editor.apply();
-    }
-
     private void setProfileDataToView() {
         binding.profileName.setText(firstName + " " + lastName);
         setGenderAndAge();
         setProfileImage();
         binding.program.setText(program);
-        binding.bio.setText(bio);
+        if(bio == null || bio.isEmpty()) {
+            binding.bio.setText("User has not written BIO yet");
+        } else {
+            binding.bio.setText(bio);
+        }
 
     }
 
     private void setGenderAndAge() {
         String age = calcAge();
-
-        if(gender.equals("null")) {
-            gender = "?";
+        if(gender.equals("?")) {
             binding.GenderAndAge.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.gender_hidden)));
         } else if(gender.equals("M")) {
             binding.GenderAndAge.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.gender_man)));
@@ -151,17 +132,18 @@ public class ProfileFragment extends Fragment {
         binding.GenderAndAge.setText(gender + " " + age);
     }
     private String calcAge() {
-        String age = "??";
-        if(dateOfBirth.equals("null")) {
-            return age;
+        if(dateOfBirth == null) {
+            return "??";
         }
 
-        // somehow calc
-        return age;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/M/d");
+        LocalDate birthdate = LocalDate.parse(dateOfBirth, formatter);
+        Period age = Period.between(birthdate, LocalDate.now());
+        return "" + age.getYears();
     }
 
     private void setProfileImage() {
-        if(pictureUrl.equals("null")) {
+        if(pictureUrl == null) {
              setDefaultImage();
         } else {
             FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
@@ -170,20 +152,12 @@ public class ProfileFragment extends Fragment {
             try {
                 File localFile = File.createTempFile("tempFile", ".jpeg");
                 imgRef.getFile(localFile).addOnSuccessListener(
-                        new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                Bitmap bitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
-                                binding.profileImage.setImageBitmap(bitmap);
-                            }
+                        taskSnapshot -> {
+                            Bitmap bitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
+                            binding.profileImage.setImageBitmap(bitmap);
                         }
                 ).addOnFailureListener(
-                        new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(getContext(), "read file failed try again", Toast.LENGTH_SHORT).show();
-                            }
-                        }
+                        e -> Log.d("IMAGE DOWNLOAD","FAILED:" + e.getMessage())
                 );
             } catch (Exception e) {
                 Log.e("getImage", e.getMessage());
@@ -193,5 +167,25 @@ public class ProfileFragment extends Fragment {
 
     private void setDefaultImage() {
         binding.profileImage.setImageResource(R.drawable.default_user_image);
+    }
+
+    private void logout() {
+        clearSharedPreference();
+        navigateToEntryScreenActivity();
+    }
+
+    private void clearSharedPreference() {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("config_file", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.putString("onboarding", "seen");
+        editor.apply();
+    }
+
+    private void navigateToEntryScreenActivity() {
+        Intent intent = new Intent(getActivity(), EntryScreenActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        getActivity().finish();
     }
 }

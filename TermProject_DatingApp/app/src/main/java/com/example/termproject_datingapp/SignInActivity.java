@@ -49,12 +49,9 @@ public class SignInActivity extends AppCompatActivity {
 
         initFirebase();
 
-        signInBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadInput();
-                signIn();
-            }
+        signInBtn.setOnClickListener(v -> {
+            loadInput();
+            signIn();
         });
     }
 

@@ -1,5 +1,8 @@
 package com.example.termproject_datingapp.utils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +28,7 @@ public class Validation {
     };
 
     public static void isValidProgramSelected(String program) throws Exception {
-        if(program.isEmpty()) {
+        if(program.isEmpty() || program.equals("Select Program")) {
             throw new Exception("Program is not selected");
         };
     };
@@ -47,5 +50,20 @@ public class Validation {
         if(email.isEmpty() || password.isEmpty()) {
             throw new Exception("Type your email and password");
         }
+    }
+
+    public static String returnDateStringIfValidated(String dateString) throws Exception {
+        if(dateString.isEmpty()) return null;
+        String[] YearMonthDate = dateString.split("/");
+        LocalDate parsedDate = LocalDate.of(
+            Integer.parseInt(YearMonthDate[0]),
+            Integer.parseInt(YearMonthDate[1]),
+            Integer.parseInt(YearMonthDate[2])
+        );
+
+        if(parsedDate.isAfter(LocalDate.now())) throw new Exception("Date of Birth in valid:" + dateString);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        String formattedDate = parsedDate.format(formatter);
+        return formattedDate;
     }
 }

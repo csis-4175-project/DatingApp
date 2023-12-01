@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -27,10 +26,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.DocumentSnapshot;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -57,32 +52,12 @@ public class SignUpActivity extends AppCompatActivity {
         confirmPasswordView = findViewById(R.id.sign_up_confirm_password);
         createBtn = findViewById(R.id.sign_up_create_btn);
 
-        //Habib code
-        //don't uncomment yet
-        //getUsername();
-
         initSpinner();
         initFirebaseAuth();
 
-        createBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                user = loadInputToUserModel();
-                signUp();
-            }
-        });
-    }
-    private void getUsername(){
-        FirebaseUtil.currentUserDetails().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
-                    userModel = task.getResult().toObject(UserModel.class);
-                    if(userModel!=null){
-                        firstNameView.setText(userModel.getUsername());
-                    }
-                }
-            }
+        createBtn.setOnClickListener(v -> {
+            user = loadInputToUserModel();
+            signUp();
         });
     }
 
@@ -97,7 +72,6 @@ public class SignUpActivity extends AppCompatActivity {
             userModel.setCreatedTimestamp(createTimestamp());
         }else{
             //create user based on input
-            //user model
             userModel = new UserModel(username, FirebaseUtil.currentUSerID() , createTimestamp());
         }
 
@@ -105,10 +79,7 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()){
-                    Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-                    //clear everything and open main activity
-                    intent.setFlags(intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
+                    // do nothing
                 }
             }
         });
@@ -164,12 +135,13 @@ public class SignUpActivity extends AppCompatActivity {
                 if (createUser.isSuccessful()) {
 
                     setUserName(); //do not move this method
+
                     firebaseUser = firebaseAuth.getCurrentUser();
                     setIdToUserModel(firebaseUser.getUid());
-                    sendEmailVerification();
+                    // sendEmailVerification(); // comment out for testing
                     saveUserToDB();
                     saveUserToSharedPreferences();
-                    navigateToSignUpSuccessActivity();
+                    navigateToMainActivity();
                 } else {
                     Toast.makeText(SignUpActivity.this, "Email is already registered.", Toast.LENGTH_SHORT).show();
                 }
@@ -184,7 +156,7 @@ public class SignUpActivity extends AppCompatActivity {
         firebaseUser.sendEmailVerification().addOnCompleteListener(sendEmail -> {
             if (sendEmail.isSuccessful()) {
                 Log.d("sendEmailVerification","Successfully sent email verification");
-                navigateToSignUpSuccessActivity();
+                 navigateToSignUpSuccessActivity();
             } else {
                 Toast.makeText(SignUpActivity.this, "Sending email failed.", Toast.LENGTH_SHORT).show();
                 Log.e("sendEmailVerification","failed to send email verification");
@@ -220,5 +192,18 @@ public class SignUpActivity extends AppCompatActivity {
     private void navigateToSignUpSuccessActivity() {
         startActivity(new Intent(SignUpActivity.this, SignUpSuccessActivity.class));
         finish();
+    }
+
+    private void navigateToMainActivity() {
+        Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+        deleteAllPreviousActivity(intent);
+        startActivity(intent);
+        finish();
+    }
+
+    private void deleteAllPreviousActivity(Intent intent) {
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     }
 }
