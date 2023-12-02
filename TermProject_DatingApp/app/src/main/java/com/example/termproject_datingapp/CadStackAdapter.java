@@ -1,4 +1,4 @@
-package com.example.swipingfunction;
+package com.example.termproject_datingapp;
 
 import android.view.LayoutInflater;
 import android.view.View;

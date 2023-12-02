@@ -1,4 +1,4 @@
-package com.example.swipingfunction;
+package com.example.termproject_datingapp;
 
 import androidx.recyclerview.widget.DiffUtil;
 
