@@ -15,12 +15,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Dating App"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_marginStart="10dp"
             android:layout_centerVertical="true"
-            />
+            android:layout_marginStart="10dp"
+            android:text="Douglas Connect"
+            android:textSize="22sp"
+            android:textStyle="bold" />
 
         <ImageButton
             android:id="@+id/main_search_button"
